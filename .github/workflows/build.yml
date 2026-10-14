@@ -16,11 +16,11 @@ permissions:
   contents: write
 
 concurrency:
-  group: aria2-${{ github.workflow }}-${{ github.ref }}-${{ inputs.aria2_version || github.ref_name }}
+  group: aria2-${{ github.workflow }}-${{ github.ref }}-${{ inputs.aria2_version || 'default' }}
   cancel-in-progress: true
 
 env:
-  ARIA2_VERSION: ${{ inputs.aria2_version || (startsWith(github.ref, 'refs/tags/v') && format('{0}', substr(github.ref_name, 1)) || '1.37.0') }}
+  ARIA2_VERSION: ${{ inputs.aria2_version || '1.37.0' }}
 
 jobs:
   build:
