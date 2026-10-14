@@ -220,6 +220,8 @@ jobs:
           cd build/aria2-src
           sed -i 's/const char\* gai_strerror(ecode)/const char* gai_strerror(int ecode)/g' src/gai_strerror.c
           sed -i '/int ecode;/d' src/gai_strerror.c
+          # Fix Clang / libc++ missing <iterator> for std::back_inserter
+          sed -i '1i #include <iterator>' src/common.h src/AbstractCommand.cc
           git rev-parse --verify HEAD
           autoreconf -i
 
@@ -287,32 +289,44 @@ jobs:
           mkdir -p release-assets
 
           # Windows x64
-          cp artifacts/aria2-windows-x86_64/aria2c.exe release-assets/aria2c-${{ env.ARIA2_VERSION }}-windows-x64.exe
-          (cd artifacts/aria2-windows-x86_64 && zip -9 "${GITHUB_WORKSPACE}/release-assets/aria2c-${{ env.ARIA2_VERSION }}-windows-x64.zip" aria2c.exe)
+          if [ -d "artifacts/aria2-windows-x86_64" ]; then
+            cp artifacts/aria2-windows-x86_64/aria2c.exe release-assets/aria2c-${{ env.ARIA2_VERSION }}-windows-x64.exe
+            (cd artifacts/aria2-windows-x86_64 && zip -9 "${GITHUB_WORKSPACE}/release-assets/aria2c-${{ env.ARIA2_VERSION }}-windows-x64.zip" aria2c.exe)
+          fi
 
           # Windows ARM64
-          cp artifacts/aria2-windows-aarch64/aria2c.exe release-assets/aria2c-${{ env.ARIA2_VERSION }}-windows-arm64.exe
-          (cd artifacts/aria2-windows-aarch64 && zip -9 "${GITHUB_WORKSPACE}/release-assets/aria2c-${{ env.ARIA2_VERSION }}-windows-arm64.zip" aria2c.exe)
+          if [ -d "artifacts/aria2-windows-aarch64" ]; then
+            cp artifacts/aria2-windows-aarch64/aria2c.exe release-assets/aria2c-${{ env.ARIA2_VERSION }}-windows-arm64.exe
+            (cd artifacts/aria2-windows-aarch64 && zip -9 "${GITHUB_WORKSPACE}/release-assets/aria2c-${{ env.ARIA2_VERSION }}-windows-arm64.zip" aria2c.exe)
+          fi
 
           # macOS x64 (Intel)
-          cp artifacts/aria2-macos-x86_64/aria2c release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-x64
-          chmod +x release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-x64
-          tar -czf release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-x64.tar.gz -C artifacts/aria2-macos-x86_64 aria2c
+          if [ -d "artifacts/aria2-macos-x86_64" ]; then
+            cp artifacts/aria2-macos-x86_64/aria2c release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-x64
+            chmod +x release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-x64
+            tar -czf release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-x64.tar.gz -C artifacts/aria2-macos-x86_64 aria2c
+          fi
 
           # macOS ARM64 (Apple Silicon)
-          cp artifacts/aria2-macos-aarch64/aria2c release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-arm64
-          chmod +x release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-arm64
-          tar -czf release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-arm64.tar.gz -C artifacts/aria2-macos-aarch64 aria2c
+          if [ -d "artifacts/aria2-macos-aarch64" ]; then
+            cp artifacts/aria2-macos-aarch64/aria2c release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-arm64
+            chmod +x release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-arm64
+            tar -czf release-assets/aria2c-${{ env.ARIA2_VERSION }}-macos-arm64.tar.gz -C artifacts/aria2-macos-aarch64 aria2c
+          fi
 
           # Linux x64
-          cp artifacts/aria2-linux-x86_64/aria2c release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-x64
-          chmod +x release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-x64
-          tar -czf release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-x64.tar.gz -C artifacts/aria2-linux-x86_64 aria2c
+          if [ -d "artifacts/aria2-linux-x86_64" ]; then
+            cp artifacts/aria2-linux-x86_64/aria2c release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-x64
+            chmod +x release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-x64
+            tar -czf release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-x64.tar.gz -C artifacts/aria2-linux-x86_64 aria2c
+          fi
 
           # Linux ARM64
-          cp artifacts/aria2-linux-aarch64/aria2c release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-arm64
-          chmod +x release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-arm64
-          tar -czf release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-arm64.tar.gz -C artifacts/aria2-linux-aarch64 aria2c
+          if [ -d "artifacts/aria2-linux-aarch64" ]; then
+            cp artifacts/aria2-linux-aarch64/aria2c release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-arm64
+            chmod +x release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-arm64
+            tar -czf release-assets/aria2c-${{ env.ARIA2_VERSION }}-linux-arm64.tar.gz -C artifacts/aria2-linux-aarch64 aria2c
+          fi
 
           # Generate SHA256SUMS.txt
           cd release-assets
