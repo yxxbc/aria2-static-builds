@@ -1,0 +1,11 @@
+# Build artifacts
+build/
+artifacts/
+release-assets/
+*.exe
+aria2c
+*.tar.gz
+*.zip
+*.sha256
+SHA256SUMS.txt
+.DS_Store
